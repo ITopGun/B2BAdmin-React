@@ -65,7 +65,7 @@ import { useTranslate, useBasename } from 'ra-core';
  *     </Admin>
  * );
  */
-export const MenuItemLink = forwardRef<any, MenuItemLinkProps>((props, ref) => {
+export const MenuItemLink = forwardRef((props: MenuItemLinkProps, ref) => {
     const {
         className,
         primaryText,
@@ -101,8 +101,8 @@ export const MenuItemLink = forwardRef<any, MenuItemLinkProps>((props, ref) => {
                 className={clsx(className, {
                     [MenuItemLinkClasses.active]: !!match,
                 })}
-                // @ts-ignore
                 component={LinkRef}
+                // @ts-ignore
                 ref={ref}
                 tabIndex={0}
                 {...rest}
