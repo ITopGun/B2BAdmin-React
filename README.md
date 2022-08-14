@@ -272,6 +272,7 @@ And then browse to [http://localhost:4000/](http://localhost:4000/)
 
 ## More from ITopGun
 
+- [✔️React Material Admin](https://github.com/ITopGun/React-MUI-Admin) - React Material Admin — Material-UI Dashboard
 - [🚀 React Native Starter](https://github.com/ITopGun/React-Native-Starter) - A powerful react native starter template that bootstraps development of your mobile application
 - [🔥 React Dashboard](https://github.com/ITopGun/React-Dashboard.git) - React Dashboard - isomorphic admin dashboard template with GraphQL
 - [❤️ Saleor Commerce](https://github.com/ITopGun/Saleore-combyPGDR.git) - A modular, high performance, headless e-commerce platform built with Python, GraphQL, Django, and React.
