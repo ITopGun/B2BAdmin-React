@@ -263,3 +263,17 @@ make doc
 ```
 
 And then browse to [http://localhost:4000/](http://localhost:4000/)
+
+## How can I support developers?
+
+- Star our GitHub repo :star:
+- Create pull requests, submit bugs, suggest new features or documentation updates :wrench:
+- Follow [@ITopGun on Github](https://github.com/ITopGun).
+
+## More from ITopGun
+
+- [✔️React Material Admin](https://github.com/ITopGun/React-MUI-Admin) - React Material Admin — Material-UI Dashboard
+- [🚀 React Native Starter](https://github.com/ITopGun/React-Native-Starter) - A powerful react native starter template that bootstraps development of your mobile application
+- [🔥 React Dashboard](https://github.com/ITopGun/React-Dashboard.git) - React Dashboard - isomorphic admin dashboard template with GraphQL
+- [❤️ Saleor Commerce](https://github.com/ITopGun/Saleore-combyPGDR.git) - A modular, high performance, headless e-commerce platform built with Python, GraphQL, Django, and React.
+- [💥 Ant Design](https://github.com/ITopGun/ant-design.git) - An enterprise-class UI design language and React UI library.
