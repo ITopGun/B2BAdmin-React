@@ -60,6 +60,7 @@ describe('Create Page', () => {
                 value: 'foo',
             },
         ]);
+        CreatePage.submit();
         cy.get('.ra-input-backlinks').contains('Required');
     });
 
@@ -90,7 +91,7 @@ describe('Create Page', () => {
                 value: 'Annamarie Mayer',
             },
         ]);
-        cy.get('[role="option"]').trigger('click');
+        cy.get('[role="option"]:first').trigger('click');
         cy.get(CreatePage.elements.input('authors.0.role')).should(
             el => expect(el).to.exist
         );
