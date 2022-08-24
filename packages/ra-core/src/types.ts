@@ -59,7 +59,9 @@ export interface UserIdentity {
  * authProvider types
  */
 export type AuthProvider = {
-    login: (params: any) => Promise<any>;
+    login: (
+        params: any
+    ) => Promise<{ redirectTo?: string | boolean } | void | any>;
     logout: (params: any) => Promise<void | false | string>;
     checkAuth: (params: any) => Promise<void>;
     checkError: (error: any) => Promise<void>;
@@ -257,6 +259,8 @@ export type LegacyDataProvider = (
     params: any
 ) => Promise<any>;
 
+export type RecordToStringFunction = (record: any) => string;
+
 export interface ResourceDefinition {
     readonly name: string;
     readonly options?: any;
@@ -265,6 +269,10 @@ export interface ResourceDefinition {
     readonly hasShow?: boolean;
     readonly hasCreate?: boolean;
     readonly icon?: any;
+    readonly recordRepresentation?:
+        | ReactElement
+        | RecordToStringFunction
+        | string;
 }
 
 /**
@@ -329,6 +337,7 @@ export interface ResourceProps {
     edit?: ComponentType<any> | ReactElement;
     show?: ComponentType<any> | ReactElement;
     icon?: ComponentType<any>;
+    recordRepresentation?: ReactElement | RecordToStringFunction | string;
     options?: ResourceOptions;
 }
 

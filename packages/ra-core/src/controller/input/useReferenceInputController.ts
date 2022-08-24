@@ -97,6 +97,7 @@ export const useReferenceInputController = <RecordType extends RaRecord = any>(
         },
         {
             enabled: isGetMatchingEnabled,
+            keepPreviousData: true,
             ...queryOptions,
         }
     );
@@ -169,6 +170,7 @@ export const useReferenceInputController = <RecordType extends RaRecord = any>(
             ? params.page * params.perPage < total
             : undefined,
         hasPreviousPage: pageInfo ? pageInfo.hasPreviousPage : params.page > 1,
+        isFromReference: true,
     };
 };
 
