@@ -40,4 +40,5 @@ export type ChoicesContextValue<RecordType extends RaRecord = any> = {
     sort: SortPayload;
     source: string;
     total: number;
+    isFromReference: boolean;
 };
