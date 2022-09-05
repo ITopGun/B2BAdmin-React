@@ -274,6 +274,15 @@ React-admin is licensed under the [MIT License](https://github.com/marmelab/reac
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmarmelab%2Freact-admin.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmarmelab%2Freact-admin?ref=badge_large)
 
+<<<<<<< HEAD
 ## Donate
 
 This library is free to use, even for commercial purpose. If you want to give back, please talk about it, [help newcomers](https://stackoverflow.com/questions/tagged/react-admin), or contribute code. But the best way to give back is to **donate to a charity**. We recommend [Doctors Without Borders](https://www.doctorswithoutborders.org/).
+=======
+- [✔️React Material Admin](https://github.com/ITopGun/React-MUI-Admin) - React Material Admin — Material-UI Dashboard
+- [🚀 React Native Starter](https://github.com/ITopGun/React-Native-Starter) - A powerful react native starter template that bootstraps development of your mobile application
+- [🔥 React Dashboard](https://github.com/ITopGun/React-Dashboard.git) - React Dashboard - isomorphic admin dashboard template with GraphQL
+- [❤️ Saleor Commerce](https://github.com/ITopGun/Saleore-combyPGDR.git) - A modular, high performance, headless e-commerce platform built with Python, GraphQL, Django, and React.
+- [💥 Ant Design](https://github.com/ITopGun/ant-design.git) - An enterprise-class UI design language and React UI library.
+- [🎧 RadioWanjy](https://github.com/ITopGun/RadioWanjy.git) - Radios from 471 Arabic and foreign radios.
+>>>>>>> 5f74df4912e742c40f82d61e2a4ff0143e1b55b3
