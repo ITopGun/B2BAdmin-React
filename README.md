@@ -1,10 +1,7 @@
-# react-admin [![Build status](https://github.com/marmelab/react-admin/actions/workflows/test.yml/badge.svg)](https://github.com/marmelab/react-admin/actions/workflows/test.yml) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmarmelab%2Freact-admin.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmarmelab%2Freact-admin?ref=badge_shield) [![StandWithUkraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+# React-Admin
 
-A frontend Framework for building data-driven applications running in the browser on top of REST/GraphQL APIs, using ES6, [React](https://facebook.github.io/react/) and [Material Design](https://material.io/). Open sourced and maintained by [marmelab](https://marmelab.com/).
+A frontend Framework for building data-driven applications running in the browser on top of REST/GraphQL APIs, using ES6, [React](https://facebook.github.io/react/) and [Material Design](https://material.io/). Open sourced and maintained by [ITopGun](https://github.com/ITopGun).
 
-[Home page](https://marmelab.com/react-admin/) - [Documentation](https://marmelab.com/react-admin/Tutorial.html) - [Demo](https://marmelab.com/react-admin-demo/) - [Blog](https://marmelab.com/en/blog/#react-admin) - [Releases](https://github.com/marmelab/react-admin/releases) - [Support](https://stackoverflow.com/questions/tagged/react-admin)
-
-[![react-admin-demo](https://marmelab.com/react-admin/img/react-admin-demo-still.png)](https://vimeo.com/474999017)
 
 ## Features
 
@@ -157,33 +154,6 @@ make run-demo
 
 And then browse to the URL displayed in your console.
 
-## Support
-
-You can get professional support from Marmelab via [React-Admin Enterprise Edition](https://marmelab.com/ra-enterprise), or community support via [StackOverflow](https://stackoverflow.com/questions/tagged/react-admin). 
-
-## Versions In This Repository
-
-* [master](https://github.com/marmelab/react-admin/commits/master) - commits that will be included in the next _patch_ release
-
-* [next](https://github.com/marmelab/react-admin/commits/next) - commits that will be included in the next _major_ or _minor_ release
-
-Bugfix PRs that don't break BC should be made against **master**. All other PRs (new features, bugfix with BC break) should be made against **next**.
-
-## Contributing
-
-If you want to give a hand: Thank you! There are many things you can do to help making react-admin better. 
-
-The easiest task is **bug triaging**. Check that new issues on GitHub follow the issue template and give a way to reproduce the issue. If not, comment on the issue to ask precisions. Then, try and reproduce the issue following the description. If you managed to reproduce the issue, add a comment to say it. Otherwise, add a comment to say that something is missing. 
-
-The second way to contribute is to **answer support questions on [StackOverflow](https://stackoverflow.com/questions/tagged/react-admin)**. There are many beginner questions there, so even if you're not super experienced with react-admin, there is someone you can help there. 
-
-Pull requests for **bug fixes** are welcome on the [GitHub repository](https://github.com/marmelab/react-admin). There is always a bunch of [issues labeled "Good First Issue"](https://github.com/marmelab/react-admin/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) in the bug tracker - start with these. 
-
-If you want to **add a feature**, you can open a Pull request on the `next` branch. We don't accept all features - we try to keep the react-admin code small and manageable. Try and see if your feature can't be built as an additional `npm` package. If you're in doubt, open a "Feature Request" issue to see if the core team would accept your feature before developing it.
-
-For all Pull requests, you must follow the coding style of the existing files (based on [prettier](https://github.com/prettier/prettier)), and include unit tests and documentation. Be prepared for a thorough code review, and be patient for the merge - this is an open-source initiative.
-
-**Tip**: Most of the commands used by the react-admin developers are automated in the `makefile`. Feel free to type `make` without argument to see a list of the available commands. 
 
 ### Setup
 
@@ -195,13 +165,6 @@ You can use Gitpod(An Online Open Source VS Code like IDE which is free for Open
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
 
-### Testing Your Changes In The Example Apps
-
-When developing, most of the time we use the **simple example** to do visual check. It's the same application that we use in CodeSandbox to reproduce errors (see https://codesandbox.io/s/github/marmelab/react-admin/tree/master/examples/simple). The source is located under `examples/simple/`. Call `make run` to launch that example on port 8080 (http://localhost:8080). This command includes a `watch` on the react-admin source, so any of the changes you make to the react-admin packages triggers a live update of the simple example in your browser. 
-
-However, the simple example is sometimes too limited. You can use the **demo example** (the source for https://marmelab.com/react-admin-demo/), which is more complete. The source is located under `examples/demo/`. Call `make run-demo` to launch the demo example with a REST dataProvider, or `make run-graphql-demo` to run it with a GraphQL dataProvider. Unfortunately, due to the fact that we use Create React App for this demo, these commands don't watch the changes made in the packages. You'll have to rebuild the react-admin packages after a change (using `make build`, or the more targeted `make build-ra-core`, `make build-ra-ui-materialui`, etc.) to see the effect in the demo app.
-
-Both of these examples work without server - the API is simulated on the client-side. 
 
 ### Testing Your Changes In Your App
 
@@ -268,16 +231,8 @@ make doc
 
 And then browse to [http://localhost:4000/](http://localhost:4000/)
 
-## License
 
-React-admin is licensed under the [MIT License](https://github.com/marmelab/react-admin/blob/master/LICENSE.md), sponsored and supported by [marmelab](https://marmelab.com).
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmarmelab%2Freact-admin.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmarmelab%2Freact-admin?ref=badge_large)
-
-<<<<<<< HEAD
-## Donate
-
-This library is free to use, even for commercial purpose. If you want to give back, please talk about it, [help newcomers](https://stackoverflow.com/questions/tagged/react-admin), or contribute code. But the best way to give back is to **donate to a charity**. We recommend [Doctors Without Borders](https://www.doctorswithoutborders.org/).
 =======
 - [✔️React Material Admin](https://github.com/ITopGun/React-MUI-Admin) - React Material Admin — Material-UI Dashboard
 - [🚀 React Native Starter](https://github.com/ITopGun/React-Native-Starter) - A powerful react native starter template that bootstraps development of your mobile application
@@ -285,4 +240,3 @@ This library is free to use, even for commercial purpose. If you want to give ba
 - [❤️ Saleor Commerce](https://github.com/ITopGun/Saleore-combyPGDR.git) - A modular, high performance, headless e-commerce platform built with Python, GraphQL, Django, and React.
 - [💥 Ant Design](https://github.com/ITopGun/ant-design.git) - An enterprise-class UI design language and React UI library.
 - [🎧 RadioWanjy](https://github.com/ITopGun/RadioWanjy.git) - Radios from 471 Arabic and foreign radios.
->>>>>>> 5f74df4912e742c40f82d61e2a4ff0143e1b55b3
