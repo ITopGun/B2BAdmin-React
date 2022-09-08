@@ -154,13 +154,6 @@ make run-demo
 
 And then browse to the URL displayed in your console.
 
-## Versions In This Repository
-
-* [master](https://github.com/marmelab/react-admin/commits/master) - commits that will be included in the next _patch_ release
-
-* [next](https://github.com/marmelab/react-admin/commits/next) - commits that will be included in the next _major_ or _minor_ release
-
-Bugfix PRs that don't break BC should be made against **master**. All other PRs (new features, bugfix with BC break) should be made against **next**.
 
 ## Contributing
 
