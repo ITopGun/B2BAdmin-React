@@ -2,7 +2,6 @@
 
 A frontend Framework for building data-driven applications running in the browser on top of REST/GraphQL APIs, using ES6, [React](https://facebook.github.io/react/) and [Material Design](https://material.io/). Open sourced and maintained by [ITopGun](https://github.com/ITopGun).
 
-[Home page](https://github.com/ITopGun/B2BAdmin-React) - [Demo](https://marmelab.com/react-admin-demo/)
 
 ## Features
 
