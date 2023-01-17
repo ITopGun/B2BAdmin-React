@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ReactElement, useCallback, ChangeEvent } from 'react';
+import { ReactElement, useCallback, useEffect, ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { MenuItem, TextFieldProps } from '@mui/material';
@@ -112,7 +112,7 @@ export const SelectInput = (props: SelectInputProps) => {
         create,
         createLabel,
         createValue,
-        defaultValue = '',
+        defaultValue,
         disableValue,
         emptyText,
         emptyValue,
@@ -136,6 +136,16 @@ export const SelectInput = (props: SelectInputProps) => {
         ...rest
     } = props;
     const translate = useTranslate();
+
+    useEffect(() => {
+        // eslint-disable-next-line eqeqeq
+        if (emptyValue == null) {
+            throw new Error(
+                `emptyValue being set to null or undefined is not supported. Use parse to turn the empty string into null.`
+            );
+        }
+    }, [emptyValue]);
+
     const {
         allChoices,
         isLoading,
@@ -150,6 +160,18 @@ export const SelectInput = (props: SelectInputProps) => {
         resource: resourceProp,
         source: sourceProp,
     });
+
+    if (source === undefined) {
+        throw new Error(
+            `If you're not wrapping the SelectInput inside a ReferenceInput, you must provide the source prop`
+        );
+    }
+
+    if (!isLoading && !fetchError && allChoices === undefined) {
+        throw new Error(
+            `If you're not wrapping the SelectInput inside a ReferenceInput, you must provide the choices prop`
+        );
+    }
 
     const getRecordRepresentation = useGetRecordRepresentation(resource);
     const { getChoiceText, getChoiceValue, getDisableValue } = useChoices({
@@ -168,8 +190,8 @@ export const SelectInput = (props: SelectInputProps) => {
         formState: { isSubmitted },
     } = useInput({
         defaultValue,
-        format,
         parse,
+        format,
         onBlur,
         onChange,
         resource,
@@ -382,6 +404,7 @@ const sanitizeRestProps = ({
     setFilter,
     setPagination,
     setSort,
+    shouldUnregister,
     sort,
     subscription,
     type,

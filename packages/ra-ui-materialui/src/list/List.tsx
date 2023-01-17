@@ -68,6 +68,7 @@ export const List = <RecordType extends RaRecord = any>({
     queryOptions,
     resource,
     sort,
+    storeKey,
     ...rest
 }: ListProps<RecordType>): ReactElement => (
     <ListBase<RecordType>
@@ -81,6 +82,7 @@ export const List = <RecordType extends RaRecord = any>({
         queryOptions={queryOptions}
         resource={resource}
         sort={sort}
+        storeKey={storeKey}
     >
         <ListView<RecordType> {...rest} />
     </ListBase>
@@ -95,7 +97,7 @@ List.propTypes = {
     // @ts-ignore-line
     actions: PropTypes.oneOfType([PropTypes.bool, PropTypes.element]),
     aside: PropTypes.element,
-    children: PropTypes.element.isRequired,
+    children: PropTypes.node.isRequired,
     className: PropTypes.string,
     emptyWhileLoading: PropTypes.bool,
     filter: PropTypes.object,

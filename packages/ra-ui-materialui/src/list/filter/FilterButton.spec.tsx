@@ -92,7 +92,7 @@ describe('<FilterButton />', () => {
             );
         });
 
-        it('should remove all filters when the "Clear all filters" button is clicked', async () => {
+        it('should remove all filters when the "Remove all filters" button is clicked', async () => {
             render(<Basic />);
 
             // First, check we don't have a clear filters option yet
@@ -123,6 +123,66 @@ describe('<FilterButton />', () => {
                     )
                 ).toBeNull();
             });
+        });
+
+        it('should remove all alwaysOn filters when the "Remove all filters" button is clicked', async () => {
+            render(<Basic />);
+
+            // First, check we don't have a clear filters option yet
+            await screen.findByText('Add filter');
+            fireEvent.click(screen.getByText('Add filter'));
+
+            await screen.findByText('Title', { selector: 'li > span' });
+            expect(screen.queryByDisplayValue('Remove all filters')).toBeNull();
+
+            // Then we apply a filter to an alwaysOn filter
+            fireEvent.change(screen.getByLabelText('Search'), {
+                target: {
+                    value:
+                        'Accusantium qui nihil voluptatum quia voluptas maxime ab similique',
+                },
+            });
+            await screen.findByDisplayValue(
+                'Accusantium qui nihil voluptatum quia voluptas maxime ab similique'
+            );
+
+            // Then we clear all filters
+            fireEvent.click(screen.getByText('Add filter'));
+            await screen.findByText('Remove all filters');
+            fireEvent.click(screen.getByText('Remove all filters'));
+
+            // We check that the previously applied filter has been removed
+            await waitFor(() => {
+                expect(
+                    screen.queryByDisplayValue(
+                        'Accusantium qui nihil voluptatum quia voluptas maxime ab similique'
+                    )
+                ).toBeNull();
+            });
+        });
+
+        it('should not display save query in filter button', async () => {
+            const { queryByText } = render(
+                <AdminContext theme={theme}>
+                    <FilterButton
+                        {...defaultProps}
+                        filterValues={{ title: 'foo' }}
+                        filters={[
+                            <TextInput source="Returned" label="Returned" />,
+                        ]}
+                        disableSaveQuery
+                    />
+                </AdminContext>
+            );
+            expect(
+                screen.queryByLabelText('ra.action.add_filter')
+            ).not.toBeNull();
+
+            fireEvent.click(screen.getByLabelText('ra.action.add_filter'));
+
+            await screen.findByText('Returned');
+
+            expect(queryByText('ra.saved_queries.new_label')).toBeNull();
         });
     });
 });

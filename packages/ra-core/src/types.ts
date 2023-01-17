@@ -67,7 +67,13 @@ export type AuthProvider = {
     checkError: (error: any) => Promise<void>;
     getIdentity?: () => Promise<UserIdentity>;
     getPermissions: (params: any) => Promise<any>;
+    handleCallback?: () => Promise<AuthRedirectResult | void | any>;
     [key: string]: any;
+};
+
+export type AuthRedirectResult = {
+    redirectTo?: string | false;
+    logoutOnFailure?: boolean;
 };
 
 export type LegacyAuthProvider = (
@@ -143,6 +149,10 @@ export interface GetListResult<RecordType extends RaRecord = any> {
     };
 }
 
+export interface GetInfiniteListResult<RecordType extends RaRecord = any>
+    extends GetListResult<RecordType> {
+    pageParam?: number;
+}
 export interface GetOneParams<RecordType extends RaRecord = any> {
     id: RecordType['id'];
     meta?: any;
@@ -204,7 +214,7 @@ export interface CreateResult<RecordType extends RaRecord = any> {
 }
 
 export interface DeleteParams<RecordType extends RaRecord = any> {
-    id: Identifier;
+    id: RecordType['id'];
     previousData?: RecordType;
     meta?: any;
 }
@@ -339,6 +349,7 @@ export interface ResourceProps {
     icon?: ComponentType<any>;
     recordRepresentation?: ReactElement | RecordToStringFunction | string;
     options?: ResourceOptions;
+    children?: ReactNode;
 }
 
 export type Exporter = (

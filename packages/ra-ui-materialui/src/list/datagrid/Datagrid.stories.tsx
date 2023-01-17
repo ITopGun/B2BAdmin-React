@@ -91,7 +91,7 @@ export const Basic = () => (
 const ExpandPanel = () => {
     const book = useRecordContext();
     return (
-        <div>
+        <div data-testid="ExpandPanel">
             <i>{book.title}</i>, by {book.author} ({book.year})
         </div>
     );
@@ -100,6 +100,17 @@ const ExpandPanel = () => {
 export const Expand = () => (
     <Wrapper>
         <Datagrid expand={<ExpandPanel />}>
+            <TextField source="id" />
+            <TextField source="title" />
+            <TextField source="author" />
+            <TextField source="year" />
+        </Datagrid>
+    </Wrapper>
+);
+
+export const ExpandSingle = () => (
+    <Wrapper>
+        <Datagrid expand={<ExpandPanel />} expandSingle>
             <TextField source="id" />
             <TextField source="title" />
             <TextField source="author" />
