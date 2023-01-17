@@ -101,9 +101,12 @@ describe('<TimeInput />', () => {
         ).not.toBeNull();
         fireEvent.click(screen.getByLabelText('ra.action.save'));
         await waitFor(() => {
-            expect(onSubmit).toHaveBeenCalledWith({
-                publishedAt,
-            });
+            expect(onSubmit).toHaveBeenCalledWith(
+                {
+                    publishedAt,
+                },
+                expect.anything()
+            );
         });
     });
 
@@ -129,9 +132,49 @@ describe('<TimeInput />', () => {
         ).not.toBeNull();
         fireEvent.click(screen.getByLabelText('ra.action.save'));
         await waitFor(() => {
-            expect(onSubmit).toHaveBeenCalledWith({
-                publishedAt,
-            });
+            expect(onSubmit).toHaveBeenCalledWith(
+                {
+                    publishedAt,
+                },
+                expect.anything()
+            );
+        });
+    });
+
+    it('should submit null when empty', async () => {
+        const publishedAt = new Date('Wed Oct 05 2011 16:48:00 GMT+0200');
+        const onSubmit = jest.fn();
+        render(
+            <AdminContext dataProvider={testDataProvider()}>
+                <SimpleForm
+                    onSubmit={onSubmit}
+                    toolbar={
+                        <Toolbar>
+                            <SaveButton alwaysEnable />
+                        </Toolbar>
+                    }
+                >
+                    <TimeInput {...defaultProps} defaultValue={publishedAt} />
+                </SimpleForm>
+            </AdminContext>
+        );
+        expect(
+            screen.queryByDisplayValue(format(publishedAt, 'HH:mm'))
+        ).not.toBeNull();
+        const input = screen.getByLabelText(
+            'resources.posts.fields.publishedAt'
+        );
+        fireEvent.change(input, {
+            target: { value: '' },
+        });
+        fireEvent.click(screen.getByLabelText('ra.action.save'));
+        await waitFor(() => {
+            expect(onSubmit).toHaveBeenCalledWith(
+                {
+                    publishedAt: null,
+                },
+                expect.anything()
+            );
         });
     });
 
@@ -170,7 +213,7 @@ describe('<TimeInput />', () => {
             const onSubmit = jest.fn();
             render(
                 <AdminContext dataProvider={testDataProvider()}>
-                    <SimpleForm onSubmit={onSubmit}>
+                    <SimpleForm mode="onBlur" onSubmit={onSubmit}>
                         <TimeInput {...defaultProps} validate={required()} />
                     </SimpleForm>
                 </AdminContext>
@@ -189,7 +232,6 @@ describe('<TimeInput />', () => {
                 target: { value: '' },
             });
             fireEvent.blur(input);
-            fireEvent.click(screen.getByText('ra.action.save'));
             await waitFor(() => {
                 expect(
                     screen.queryByText('ra.validation.required')

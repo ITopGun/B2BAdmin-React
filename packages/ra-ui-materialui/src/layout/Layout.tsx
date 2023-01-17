@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import clsx from 'clsx';
-import { styled } from '@mui/material/styles';
+import { styled, SxProps } from '@mui/material/styles';
 import { CoreLayoutProps } from 'ra-core';
 
 import { AppBar as DefaultAppBar, AppBarProps } from './AppBar';
@@ -16,6 +16,7 @@ import { Menu as DefaultMenu, MenuProps } from './Menu';
 import { Error, ErrorProps } from './Error';
 import { SkipNavigationButton } from '../button';
 import { useSidebarState } from './useSidebarState';
+import { Inspector } from '../preferences';
 
 export const Layout = (props: LayoutProps) => {
     const {
@@ -63,6 +64,7 @@ export const Layout = (props: LayoutProps) => {
                         </ErrorBoundary>
                     </div>
                 </main>
+                <Inspector />
             </div>
         </StyledLayout>
     );
@@ -76,6 +78,7 @@ export interface LayoutProps
     error?: ComponentType<ErrorProps>;
     menu?: ComponentType<MenuProps>;
     sidebar?: ComponentType<{ children: ReactNode }>;
+    sx?: SxProps;
 }
 
 export interface LayoutState {

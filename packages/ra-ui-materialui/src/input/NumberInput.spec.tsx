@@ -3,9 +3,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 
 import { NumberInput } from './NumberInput';
+import { TextInput } from './TextInput';
 import { AdminContext } from '../AdminContext';
 import { SaveButton } from '../button';
 import { SimpleForm, Toolbar } from '../form';
+import { required } from 'ra-core';
 
 describe('<NumberInput />', () => {
     const defaultProps = {
@@ -213,7 +215,10 @@ describe('<NumberInput />', () => {
             );
             fireEvent.click(screen.getByText('ra.action.save'));
             await waitFor(() => {
-                expect(onSubmit).toHaveBeenCalledWith({ views: 12 });
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { views: 12 },
+                    expect.anything()
+                );
             });
             expect(typeof onSubmit.mock.calls[0][0].views).toEqual('number');
         });
@@ -229,7 +234,10 @@ describe('<NumberInput />', () => {
             );
             fireEvent.click(screen.getByText('ra.action.save'));
             await waitFor(() => {
-                expect(onSubmit).toHaveBeenCalledWith({ views: null });
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { views: null },
+                    expect.anything()
+                );
             });
             expect(onSubmit.mock.calls[0][0].views).toBeNull();
         });
@@ -251,7 +259,10 @@ describe('<NumberInput />', () => {
             fireEvent.change(input, { target: { value: '3' } });
             fireEvent.click(screen.getByText('ra.action.save'));
             await waitFor(() => {
-                expect(onSubmit).toHaveBeenCalledWith({ views: 3 });
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { views: 3 },
+                    expect.anything()
+                );
             });
             expect(typeof onSubmit.mock.calls[0][0].views).toEqual('number');
         });
@@ -273,9 +284,95 @@ describe('<NumberInput />', () => {
             fireEvent.change(input, { target: { value: '' } });
             fireEvent.click(screen.getByText('ra.action.save'));
             await waitFor(() => {
-                expect(onSubmit).toHaveBeenCalledWith({ views: null });
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { views: null },
+                    expect.anything()
+                );
             });
             expect(onSubmit.mock.calls[0][0].views).toBeNull();
+        });
+
+        it('should cast value to a numeric with a custom parse function', async () => {
+            const onSubmit = jest.fn();
+
+            render(
+                <AdminContext>
+                    <SimpleForm toolbar={<MyToolbar />} onSubmit={onSubmit}>
+                        <NumberInput {...defaultProps} parse={value => value} />
+                    </SimpleForm>
+                </AdminContext>
+            );
+            const input = screen.getByLabelText('resources.posts.fields.views');
+            fireEvent.change(input, { target: { value: '12' } });
+            fireEvent.click(screen.getByText('ra.action.save'));
+            await waitFor(() => {
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { views: 12 },
+                    expect.anything()
+                );
+            });
+            expect(typeof onSubmit.mock.calls[0][0].views).toEqual('number');
+        });
+
+        it('should cast 0 to a numeric with a custom parse function', async () => {
+            const onSubmit = jest.fn();
+
+            render(
+                <AdminContext>
+                    <SimpleForm toolbar={<MyToolbar />} onSubmit={onSubmit}>
+                        <NumberInput {...defaultProps} parse={value => value} />
+                    </SimpleForm>
+                </AdminContext>
+            );
+            const input = screen.getByLabelText('resources.posts.fields.views');
+            fireEvent.change(input, { target: { value: '0' } });
+            fireEvent.click(screen.getByText('ra.action.save'));
+            await waitFor(() => {
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { views: 0 },
+                    expect.anything()
+                );
+            });
+            expect(typeof onSubmit.mock.calls[0][0].views).toEqual('number');
+        });
+
+        it('should reformat if format function gets changed', async () => {
+            const AngleInput = props => {
+                const unit = useWatch({ name: 'unit' });
+                return (
+                    <NumberInput
+                        format={v =>
+                            unit === 'radian' ? v : (v / Math.PI) * 180
+                        }
+                        {...props}
+                    />
+                );
+            };
+
+            const onSubmit = jest.fn();
+
+            render(
+                <AdminContext>
+                    <SimpleForm
+                        defaultValues={{ unit: 'radian', value: Math.PI / 2 }}
+                        onSubmit={onSubmit}
+                    >
+                        <AngleInput resource="posts" source="value" />
+                        <TextInput resource="posts" source="unit" />
+                    </SimpleForm>
+                </AdminContext>
+            );
+            const valueInput = screen.getByLabelText(
+                'resources.posts.fields.value'
+            );
+            const unitInput = screen.getByLabelText(
+                'resources.posts.fields.unit'
+            );
+            fireEvent.change(unitInput, { target: { value: 'degree' } });
+
+            await waitFor(() => {
+                expect((valueInput as HTMLInputElement).value).toEqual('90');
+            });
         });
     });
 
@@ -324,7 +421,10 @@ describe('<NumberInput />', () => {
             expect(value).toEqual('3');
             fireEvent.click(screen.getByText('ra.action.save'));
             await waitFor(() => {
-                expect(onSubmit).toHaveBeenCalledWith({ views: 3 });
+                expect(onSubmit).toHaveBeenCalledWith(
+                    { views: 3 },
+                    expect.anything()
+                );
             });
         });
     });
@@ -366,6 +466,37 @@ describe('<NumberInput />', () => {
             const input = screen.getByLabelText('resources.posts.fields.views');
             fireEvent.blur(input);
             expect(onBlur).toHaveBeenCalled();
+        });
+
+        it('should display error message onBlur if required', async () => {
+            const onBlur = jest.fn();
+
+            render(
+                <AdminContext>
+                    <SimpleForm
+                        defaultValues={{ views: 12 }}
+                        onSubmit={jest.fn()}
+                        mode="onBlur"
+                    >
+                        <NumberInput
+                            {...defaultProps}
+                            onBlur={onBlur}
+                            validate={required()}
+                        />
+                    </SimpleForm>
+                </AdminContext>
+            );
+            const input = screen.getByLabelText(
+                'resources.posts.fields.views *'
+            );
+
+            fireEvent.change(input, { target: { value: '' } });
+            fireEvent.blur(input);
+            await waitFor(() => {
+                expect(
+                    screen.queryByText('ra.validation.required')
+                ).not.toBeNull();
+            });
         });
     });
 

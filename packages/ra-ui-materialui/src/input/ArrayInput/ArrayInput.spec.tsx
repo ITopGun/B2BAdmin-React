@@ -164,12 +164,12 @@ describe('<ArrayInput />', () => {
             </AdminContext>
         );
 
-        fireEvent.click(screen.getByText('ra.action.add'));
+        fireEvent.click(screen.getByLabelText('ra.action.add'));
         fireEvent.click(screen.getByText('ra.action.save'));
         await waitFor(() => {
             expect(screen.queryByText('array_min_length')).not.toBeNull();
         });
-        fireEvent.click(screen.getByText('ra.action.add'));
+        fireEvent.click(screen.getByLabelText('ra.action.add'));
         const firstId = screen.getAllByLabelText(
             'resources.bar.fields.arr.id *'
         )[0];
@@ -208,16 +208,14 @@ describe('<ArrayInput />', () => {
 
             setArrayInputVisible = setVisible;
 
-            return (
-                visible && (
-                    <ArrayInput resource="bar" source="arr">
-                        <SimpleFormIterator>
-                            <TextInput source="id" />
-                            <TextInput source="foo" />
-                        </SimpleFormIterator>
-                    </ArrayInput>
-                )
-            );
+            return visible ? (
+                <ArrayInput resource="bar" source="arr">
+                    <SimpleFormIterator>
+                        <TextInput source="id" />
+                        <TextInput source="foo" />
+                    </SimpleFormIterator>
+                </ArrayInput>
+            ) : null;
         };
 
         render(
@@ -253,11 +251,24 @@ describe('<ArrayInput />', () => {
         });
     });
 
+    it('should allow to have a helperText', () => {
+        render(
+            <AdminContext dataProvider={testDataProvider()}>
+                <SimpleForm onSubmit={jest.fn}>
+                    <ArrayInput source="foo" helperText="test helper text">
+                        <SimpleFormIterator />
+                    </ArrayInput>
+                </SimpleForm>
+            </AdminContext>
+        );
+        expect(screen.queryByText('test helper text')).not.toBeNull();
+    });
+
     describe('used within a form with global validation', () => {
         it('should display an error if the array is required and empty', async () => {
             render(<GlobalValidation />);
             await screen.findByDisplayValue('Leo Tolstoy');
-            const RemoveButtons = screen.getAllByText('Remove');
+            const RemoveButtons = screen.getAllByLabelText('Remove');
             fireEvent.click(RemoveButtons[1]);
             fireEvent.click(RemoveButtons[0]);
             const SaveButton = screen.getByText('Save');

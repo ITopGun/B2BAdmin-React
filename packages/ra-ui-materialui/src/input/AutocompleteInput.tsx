@@ -135,7 +135,7 @@ export const AutocompleteInput = <
         createItemLabel,
         createValue,
         debounce: debounceDelay = 250,
-        defaultValue = '',
+        defaultValue,
         emptyText,
         emptyValue = '',
         field: fieldOverride,
@@ -201,19 +201,47 @@ export const AutocompleteInput = <
         formState: { isSubmitted },
     } = useInput({
         defaultValue,
-        format,
         id: idOverride,
         field: fieldOverride,
         fieldState: fieldStateOverride,
         formState: formStateOverride,
+        isRequired: isRequiredOverride,
         onBlur,
         onChange,
         parse,
+        format,
         resource,
         source,
         validate,
         ...rest,
     });
+
+    const finalChoices = useMemo(
+        () =>
+            // eslint-disable-next-line eqeqeq
+            emptyText == undefined || isRequired || multiple
+                ? allChoices
+                : [
+                      {
+                          [optionValue || 'id']: emptyValue,
+                          [typeof optionText === 'string'
+                              ? optionText
+                              : 'name']: translate(emptyText, {
+                              _: emptyText,
+                          }),
+                      },
+                  ].concat(allChoices),
+        [
+            allChoices,
+            emptyValue,
+            emptyText,
+            isRequired,
+            multiple,
+            optionText,
+            optionValue,
+            translate,
+        ]
+    );
 
     const selectedChoice = useSelectedChoice<
         OptionType,
@@ -221,13 +249,28 @@ export const AutocompleteInput = <
         DisableClearable,
         SupportCreate
     >(field.value, {
-        choices: allChoices,
+        choices: finalChoices,
         // @ts-ignore
         multiple,
         optionValue,
     });
 
     useEffect(() => {
+        // eslint-disable-next-line eqeqeq
+        if (emptyValue == null) {
+            throw new Error(
+                `emptyValue being set to null or undefined is not supported. Use parse to turn the empty string into null.`
+            );
+        }
+    }, [emptyValue]);
+
+    useEffect(() => {
+        // eslint-disable-next-line eqeqeq
+        if (isValidElement(optionText) && emptyText != undefined) {
+            throw new Error(
+                `optionText of type React element is not supported when setting emptyText`
+            );
+        }
         // eslint-disable-next-line eqeqeq
         if (isValidElement(optionText) && inputText == undefined) {
             throw new Error(`
@@ -238,7 +281,7 @@ If you provided a React element for the optionText prop, you must also provide t
             throw new Error(`
 If you provided a React element for the optionText prop, you must also provide the matchSuggestion prop (used to match the user input with a choice)`);
         }
-    }, [optionText, inputText, matchSuggestion]);
+    }, [optionText, inputText, matchSuggestion, emptyText]);
 
     useEffect(() => {
         warning(
@@ -252,9 +295,7 @@ If you provided a React element for the optionText prop, you must also provide t
     const getRecordRepresentation = useGetRecordRepresentation(resource);
 
     const { getChoiceText, getChoiceValue, getSuggestions } = useSuggestions({
-        choices: allChoices,
-        emptyText,
-        emptyValue,
+        choices: finalChoices,
         limitChoicesToValue,
         matchSuggestion,
         optionText:
@@ -279,7 +320,7 @@ If you provided a React element for the optionText prop, you must also provide t
                 ]);
             }
         } else {
-            field.onChange(getChoiceValue(newValue) ?? '');
+            field.onChange(getChoiceValue(newValue) ?? emptyValue);
         }
     };
 
@@ -340,7 +381,17 @@ If you provided a React element for the optionText prop, you must also provide t
             }
 
             if (option?.id === createId) {
-                return option?.name;
+                return get(
+                    option,
+                    typeof optionText === 'string' ? optionText : 'name'
+                );
+            }
+
+            if (!isListItem && option[optionValue || 'id'] === emptyValue) {
+                return get(
+                    option,
+                    typeof optionText === 'string' ? optionText : 'name'
+                );
             }
 
             if (!isListItem && inputText !== undefined) {
@@ -349,16 +400,34 @@ If you provided a React element for the optionText prop, you must also provide t
 
             return getChoiceText(option);
         },
-        [getChoiceText, inputText, createId]
+        [
+            getChoiceText,
+            inputText,
+            createId,
+            optionText,
+            optionValue,
+            emptyValue,
+        ]
     );
 
     const finalOnBlur = useCallback((): void => {
-        if (clearOnBlur) {
+        if (clearOnBlur && !multiple) {
             const optionLabel = getOptionLabel(selectedChoice);
-            setFilterValue(optionLabel);
+            if (!isEqual(optionLabel, filterValue)) {
+                setFilterValue(optionLabel);
+                debouncedSetFilter('');
+            }
         }
         field.onBlur();
-    }, [clearOnBlur, field, selectedChoice, getOptionLabel]);
+    }, [
+        clearOnBlur,
+        field,
+        getOptionLabel,
+        selectedChoice,
+        filterValue,
+        debouncedSetFilter,
+        multiple,
+    ]);
 
     useEffect(() => {
         if (!multiple) {
@@ -378,15 +447,18 @@ If you provided a React element for the optionText prop, you must also provide t
         newInputValue: string,
         reason: string
     ) => {
-        if (!doesQueryMatchSelection(newInputValue, event?.type)) {
+        if (
+            event?.type === 'change' ||
+            !doesQueryMatchSelection(newInputValue)
+        ) {
             setFilterValue(newInputValue);
             debouncedSetFilter(newInputValue);
         }
     };
 
     const doesQueryMatchSelection = useCallback(
-        (filter: string, eventType?: string) => {
-            let selectedItemTexts = [];
+        (filter: string) => {
+            let selectedItemTexts;
 
             if (multiple) {
                 selectedItemTexts = selectedChoice.map(item =>
@@ -396,21 +468,19 @@ If you provided a React element for the optionText prop, you must also provide t
                 selectedItemTexts = [getOptionLabel(selectedChoice)];
             }
 
-            return eventType && eventType === 'change'
-                ? selectedItemTexts.includes(filter) && selectedChoice
-                : selectedItemTexts.includes(filter);
+            return selectedItemTexts.includes(filter);
         },
         [getOptionLabel, multiple, selectedChoice]
     );
     const doesQueryMatchSuggestion = useCallback(
         filter => {
-            const hasOption = !!allChoices
-                ? allChoices.some(choice => getOptionLabel(choice) === filter)
+            const hasOption = !!finalChoices
+                ? finalChoices.some(choice => getOptionLabel(choice) === filter)
                 : false;
 
             return doesQueryMatchSelection(filter) || hasOption;
         },
-        [allChoices, getOptionLabel, doesQueryMatchSelection]
+        [finalChoices, getOptionLabel, doesQueryMatchSelection]
     );
 
     const filterOptions = (options, params) => {
@@ -419,7 +489,7 @@ If you provided a React element for the optionText prop, you must also provide t
             matchSuggestion || // When using element as optionText (and matchSuggestion), options are filtered by getSuggestions, so they shouldn't be filtered here
             limitChoicesToValue // When limiting choices to values (why? it's legacy!), options are also filtered by getSuggestions, so they shouldn't be filtered here
                 ? options
-                : defaultFilterOptions(options, params); // Otherwise we let MUI's Autocomplete do the filtering
+                : defaultFilterOptions(options, params); // Otherwise, we let MUI's Autocomplete do the filtering
 
         // add create option if necessary
         const { inputValue } = params;
@@ -439,7 +509,7 @@ If you provided a React element for the optionText prop, you must also provide t
         newValue: any,
         reason: string
     ) => {
-        handleChangeWithCreateSupport(newValue != null ? newValue : '');
+        handleChangeWithCreateSupport(newValue != null ? newValue : emptyValue);
     };
 
     const oneSecondHasPassed = useTimeout(1000, filterValue);
@@ -448,9 +518,9 @@ If you provided a React element for the optionText prop, you must also provide t
         if (matchSuggestion || limitChoicesToValue) {
             return getSuggestions(filterValue);
         }
-        return allChoices?.slice(0, suggestionLimit) || [];
+        return finalChoices?.slice(0, suggestionLimit) || [];
     }, [
-        allChoices,
+        finalChoices,
         filterValue,
         getSuggestions,
         limitChoicesToValue,
@@ -459,8 +529,7 @@ If you provided a React element for the optionText prop, you must also provide t
     ]);
 
     const isOptionEqualToValue = (option, value) => {
-        // eslint-disable-next-line eqeqeq
-        return getChoiceValue(option) == getChoiceValue(value);
+        return String(getChoiceValue(option)) === String(getChoiceValue(value));
     };
 
     return (
@@ -483,11 +552,7 @@ If you provided a React element for the optionText prop, you must also provide t
                                 label={label}
                                 source={source}
                                 resource={resourceProp}
-                                isRequired={
-                                    typeof isRequiredOverride !== 'undefined'
-                                        ? isRequiredOverride
-                                        : isRequired
-                                }
+                                isRequired={isRequired}
                             />
                         }
                         error={
@@ -551,7 +616,7 @@ If you provided a React element for the optionText prop, you must also provide t
                 inputValue={filterValue}
                 loading={
                     isLoading &&
-                    (!allChoices || allChoices.length === 0) &&
+                    (!finalChoices || finalChoices.length === 0) &&
                     oneSecondHasPassed
                 }
                 value={selectedChoice}
@@ -562,7 +627,14 @@ If you provided a React element for the optionText prop, you must also provide t
                     (props as {
                         key: string;
                     }).key = getChoiceValue(record);
-                    return <li {...props}>{getOptionLabel(record, true)}</li>;
+
+                    const optionLabel = getOptionLabel(record, true);
+
+                    return (
+                        <li {...props}>
+                            {optionLabel === '' ? ' ' : optionLabel}
+                        </li>
+                    );
                 }}
             />
             {createElement}
@@ -606,6 +678,8 @@ export interface AutocompleteInputProps<
         > {
     children?: ReactNode;
     debounce?: number;
+    emptyText?: string;
+    emptyValue?: any;
     filterToQuery?: (searchText: string) => any;
     inputText?: (option: any) => string;
     setFilter?: (value: string) => void;
@@ -670,11 +744,17 @@ const getSelectedItems = (
     if (multiple) {
         return (value || [])
             .map(item =>
-                choices.find(choice => item === get(choice, optionValue))
+                choices.find(
+                    choice => String(item) === String(get(choice, optionValue))
+                )
             )
             .filter(item => !!item);
     }
-    return choices.find(choice => get(choice, optionValue) === value) || '';
+    return (
+        choices.find(
+            choice => String(get(choice, optionValue)) === String(value)
+        ) || ''
+    );
 };
 
 const DefaultFilterToQuery = searchText => ({ q: searchText });
