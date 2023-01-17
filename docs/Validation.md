@@ -14,6 +14,22 @@ React-admin relies on [react-hook-form](https://react-hook-form.com/) for the va
 
 You can’t use both form level validation and input level validation - this is a `react-hook-form` limitation.
 
+## Validation Mode
+
+By default, the validation mode is `onSubmit`, and the re-validation mode is `onChange`.
+
+Since [`<Form>`](./Form.md) actually passes all additional props to react-hook-form's [`useForm` hook](https://react-hook-form.com/api/useform/), this can easily be changed by setting the `mode` and `reValidateMode` props.
+
+```jsx
+export const UserCreate = () => (
+    <Create>
+        <SimpleForm mode="onBlur" reValidateMode="onBlur">
+            <TextInput label="First Name" source="firstName" validate={required()} />
+        </SimpleForm>
+    </Create>
+);
+```
+
 ## Global Validation
 
 The value of the form `validate` prop must be a function taking the record as input, and returning an object with error messages indexed by field. For instance:
@@ -352,14 +368,26 @@ You can use the errors returned by the dataProvider mutation as a source for the
 ```jsx
 import * as React from 'react';
 import { useCallback } from 'react';
-import { Create, SimpleForm, TextInput, useCreate } from 'react-admin';
+import { Create, SimpleForm, TextInput, useCreate, useRedirect, useNotify } from 'react-admin';
 
 export const UserCreate = () => {
+    const redirect = useRedirect();
+    const notify = useNotify();
+
     const [create] = useCreate();
     const save = useCallback(
         async values => {
             try {
-                await create('users', { data: values }, { returnPromise: true });
+                await create(
+                    'users',
+                    { data: values },
+                    { returnPromise: true }
+                );
+                notify('ra.notification.created', {
+                    type: 'info',
+                    messageArgs: { smart_count: 1 },
+                });
+                redirect('list');
             } catch (error) {
                 if (error.body.errors) {
                     // The shape of the returned validation errors must match the shape of the form
@@ -367,7 +395,7 @@ export const UserCreate = () => {
                 }
             }
         },
-        [create]
+        [create, notify, redirect]
     );
 
     return (
@@ -383,5 +411,3 @@ export const UserCreate = () => {
 {% endraw %}
 
 **Tip**: The shape of the returned validation errors must correspond to the form: a key needs to match a `source` prop.
-
-**Tip**: The returned validation errors might have any validation format we support (simple strings or object with message and args) for each key.
