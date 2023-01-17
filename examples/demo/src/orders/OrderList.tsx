@@ -3,18 +3,22 @@ import { Fragment, useCallback } from 'react';
 import {
     AutocompleteInput,
     BooleanField,
-    Datagrid,
+    Count,
+    DatagridConfigurable,
     DateField,
     DateInput,
+    ExportButton,
+    FilterButton,
     List,
     NullableBooleanInput,
     NumberField,
-    ReferenceInput,
     ReferenceField,
+    ReferenceInput,
     SearchInput,
+    SelectColumnsButton,
     TextField,
     TextInput,
-    useGetList,
+    TopToolbar,
     useListContext,
 } from 'react-admin';
 import { useMediaQuery, Divider, Tabs, Tab, Theme } from '@mui/material';
@@ -25,12 +29,21 @@ import AddressField from '../visitors/AddressField';
 import MobileGrid from './MobileGrid';
 import { Customer } from '../types';
 
+const ListActions = () => (
+    <TopToolbar>
+        <SelectColumnsButton />
+        <FilterButton />
+        <ExportButton />
+    </TopToolbar>
+);
+
 const OrderList = () => (
     <List
         filterDefaultValues={{ status: 'ordered' }}
         sort={{ field: 'date', order: 'DESC' }}
         perPage={25}
         filters={orderFilters}
+        actions={<ListActions />}
     >
         <TabbedDatagrid />
     </List>
@@ -59,37 +72,12 @@ const tabs = [
     { id: 'cancelled', name: 'cancelled' },
 ];
 
-const useGetTotals = (filterValues: any) => {
-    const { total: totalOrdered } = useGetList('commands', {
-        pagination: { perPage: 1, page: 1 },
-        sort: { field: 'id', order: 'ASC' },
-        filter: { ...filterValues, status: 'ordered' },
-    });
-    const { total: totalDelivered } = useGetList('commands', {
-        pagination: { perPage: 1, page: 1 },
-        sort: { field: 'id', order: 'ASC' },
-        filter: { ...filterValues, status: 'delivered' },
-    });
-    const { total: totalCancelled } = useGetList('commands', {
-        pagination: { perPage: 1, page: 1 },
-        sort: { field: 'id', order: 'ASC' },
-        filter: { ...filterValues, status: 'cancelled' },
-    });
-
-    return {
-        ordered: totalOrdered,
-        delivered: totalDelivered,
-        cancelled: totalCancelled,
-    };
-};
-
 const TabbedDatagrid = () => {
     const listContext = useListContext();
     const { filterValues, setFilters, displayedFilters } = listContext;
     const isXSmall = useMediaQuery<Theme>(theme =>
         theme.breakpoints.down('sm')
     );
-    const totals = useGetTotals(filterValues) as any;
 
     const handleChange = useCallback(
         (event: React.ChangeEvent<{}>, value: any) => {
@@ -116,9 +104,17 @@ const TabbedDatagrid = () => {
                     <Tab
                         key={choice.id}
                         label={
-                            totals[choice.name]
-                                ? `${choice.name} (${totals[choice.name]})`
-                                : choice.name
+                            <span>
+                                {choice.name} (
+                                <Count
+                                    filter={{
+                                        ...filterValues,
+                                        status: choice.name,
+                                    }}
+                                    sx={{ lineHeight: 'inherit' }}
+                                />
+                                )
+                            </span>
                         }
                         value={choice.id}
                     />
@@ -130,7 +126,10 @@ const TabbedDatagrid = () => {
             ) : (
                 <>
                     {filterValues.status === 'ordered' && (
-                        <Datagrid optimized rowClick="edit">
+                        <DatagridConfigurable
+                            rowClick="edit"
+                            omit={['total_ex_taxes', 'delivery_fees', 'taxes']}
+                        >
                             <DateField source="date" showTime />
                             <TextField source="reference" />
                             <CustomerReferenceField />
@@ -144,6 +143,27 @@ const TabbedDatagrid = () => {
                             </ReferenceField>
                             <NbItemsField />
                             <NumberField
+                                source="total_ex_taxes"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
+                                source="delivery_fees"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
+                                source="taxes"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
                                 source="total"
                                 options={{
                                     style: 'currency',
@@ -151,10 +171,13 @@ const TabbedDatagrid = () => {
                                 }}
                                 sx={{ fontWeight: 'bold' }}
                             />
-                        </Datagrid>
+                        </DatagridConfigurable>
                     )}
                     {filterValues.status === 'delivered' && (
-                        <Datagrid rowClick="edit">
+                        <DatagridConfigurable
+                            rowClick="edit"
+                            omit={['total_ex_taxes', 'delivery_fees', 'taxes']}
+                        >
                             <DateField source="date" showTime />
                             <TextField source="reference" />
                             <CustomerReferenceField />
@@ -168,6 +191,27 @@ const TabbedDatagrid = () => {
                             </ReferenceField>
                             <NbItemsField />
                             <NumberField
+                                source="total_ex_taxes"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
+                                source="delivery_fees"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
+                                source="taxes"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
                                 source="total"
                                 options={{
                                     style: 'currency',
@@ -179,10 +223,13 @@ const TabbedDatagrid = () => {
                                 source="returned"
                                 sx={{ mt: -0.5, mb: -0.5 }}
                             />
-                        </Datagrid>
+                        </DatagridConfigurable>
                     )}
                     {filterValues.status === 'cancelled' && (
-                        <Datagrid rowClick="edit">
+                        <DatagridConfigurable
+                            rowClick="edit"
+                            omit={['total_ex_taxes', 'delivery_fees', 'taxes']}
+                        >
                             <DateField source="date" showTime />
                             <TextField source="reference" />
                             <CustomerReferenceField />
@@ -196,6 +243,27 @@ const TabbedDatagrid = () => {
                             </ReferenceField>
                             <NbItemsField />
                             <NumberField
+                                source="total_ex_taxes"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
+                                source="delivery_fees"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
+                                source="taxes"
+                                options={{
+                                    style: 'currency',
+                                    currency: 'USD',
+                                }}
+                            />
+                            <NumberField
                                 source="total"
                                 options={{
                                     style: 'currency',
@@ -203,11 +271,7 @@ const TabbedDatagrid = () => {
                                 }}
                                 sx={{ fontWeight: 'bold' }}
                             />
-                            <BooleanField
-                                source="returned"
-                                sx={{ mt: -0.5, mb: -0.5 }}
-                            />
-                        </Datagrid>
+                        </DatagridConfigurable>
                     )}
                 </>
             )}
