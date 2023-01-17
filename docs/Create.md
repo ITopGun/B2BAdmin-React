@@ -19,7 +19,7 @@ For instance, the following component will render a creation form with 4 inputs 
 
 ```jsx
 // in src/posts.js
-import * as React from "react";
+import * as React from 'react';
 import { Create, SimpleForm, TextInput, DateInput, required } from 'react-admin';
 import RichTextInput from 'ra-input-rich-text';
 
@@ -27,7 +27,7 @@ export const PostCreate = () => (
     <Create>
         <SimpleForm>
             <TextInput source="title" validate={[required()]} fullWidth />
-            <TextInput source="teaser" multiLine={true} label="Short description" />
+            <TextInput source="teaser" multiline={true} label="Short description" />
             <RichTextInput source="body" />
             <DateInput label="Publication date" source="published_at" defaultValue={new Date()} />
         </SimpleForm>
@@ -35,7 +35,7 @@ export const PostCreate = () => (
 );
 
 // in src/App.js
-import * as React from "react";
+import * as React from 'react';
 import { Admin, Resource } from 'react-admin';
 import jsonServerProvider from 'ra-data-json-server';
 
@@ -71,7 +71,7 @@ You can customize the `<Create>` component using the following props:
 You can replace the list of default actions by your own elements using the `actions` prop:
 
 ```jsx
-import * as React from "react";
+import * as React from 'react';
 import Button from '@mui/material/Button';
 import { TopToolbar, Create } from 'react-admin';
 
@@ -241,7 +241,7 @@ The default `onError` function is:
 
 ```jsx
 (error) => {
-    notify(typeof error === 'string' ? error : error.message || 'ra.notification.http_error', { type: 'warning' });
+    notify(typeof error === 'string' ? error : error.message || 'ra.notification.http_error', { type: 'error' });
 }
 ```
 
@@ -433,21 +433,24 @@ That means that if you want to create a link to a creation form, presetting *som
 {% raw %}
 ```jsx
 import * as React from 'react';
-import { Datagrid } from 'react-admin';
+import { Datagrid, useRecordContext } from 'react-admin';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 
-const CreateRelatedCommentButton = ({ record }) => (
-    <Button
-        component={Link}
-        to={{
-            pathname: '/comments/create',
-        }}
-        state={{ record: { post_id: record.id } }}
-    >
-        Write a comment for that post
-    </Button>
-);
+const CreateRelatedCommentButton = () => {
+    const record = useRecordContext();
+    return (
+        <Button
+            component={Link}
+            to={{
+                pathname: '/comments/create',
+            }}
+            state={{ record: { post_id: record.id } }}
+        >
+            Write a comment for that post
+        </Button>
+    );
+};
 
 export default PostList = () => (
     <List>
@@ -466,21 +469,25 @@ export default PostList = () => (
 
 {% raw %}
 ```jsx
-import * as React from "react";
+import * as React from 'react';
+import { useRecordContext } from 'react-admin';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 
-const CreateRelatedCommentButton = ({ record }) => (
-    <Button
-        component={Link}
-        to={{
-            pathname: '/comments/create',
-            search: `?source=${JSON.stringify({ post_id: record.id })}`,
-        }}
-    >
-        Write a comment for that post
-    </Button>
-);
+const CreateRelatedCommentButton = () => {
+    const record = useRecordContext();
+    return (
+        <Button
+            component={Link}
+            to={{
+                pathname: '/comments/create',
+                search: `?source=${JSON.stringify({ post_id: record.id })}`,
+            }}
+        >
+            Write a comment for that post
+        </Button>
+    );
+};
 ```
 {% endraw %}
 
@@ -548,3 +555,13 @@ const PostCreate = () => {
 You can also leave the choice to the user, by supplying two submit buttons: one with a redirect, and one with a form reset. The same technique applies: use the `mutationOptions` prop on the `<SaveButton>` component.
 
 Note: In order to get the `mutationOptions` being considered, you have to set the `type` prop of the `SaveButton` to `button`.
+
+## Creating A New Record In A Modal
+
+`<Create>` is designed to be a page component, passed to the `create` prop of the `<Resource>` component. But you may want to let users create a record from another page. 
+
+![CreateDialog](https://marmelab.com/ra-enterprise/modules/assets/create-dialog.gif)
+
+* If you want to allow creation from the `list` page, use [the `<CreateDialog>` component](./CreateDialog.md)
+* If you want to allow creation from another page, use [the `<CreateInDialogButton>` component](./CreateInDialogButton.md)
+

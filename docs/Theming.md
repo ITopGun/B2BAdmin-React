@@ -120,7 +120,7 @@ The react-admin documentation for individual components also lists the classes a
 
 ## Reusable Components
 
-To reuse the same style overrides in different locations across your application, create a reusable component using [the MUI `styled()` utility](https://mui.com/system/styled/). It's a function that creates a new component based on a source component and custom styles. The basinc syntax is `styled(Component)(styles) => Component` (where `styles` forllows the same syntax as the `sx` prop).
+To reuse the same style overrides in different locations across your application, create a reusable component using [the MUI `styled()` utility](https://mui.com/system/styled/). It's a function that creates a new component based on a source component and custom styles. The basic syntax is `styled(Component)(styles) => Component` (where `styles` follows the same syntax as the `sx` prop).
 
 For instance, to create a custom `<Datagrid>` component with the header style defined in the previous section:
 
@@ -397,6 +397,34 @@ const MyAppBar = props => (
 const MyLayout = props => <Layout {...props} appBar={MyAppBar} />;
 ```
 
+## Changing the Theme Programmatically
+
+React-admin provides the `useTheme` hook to read and update the theme programmatically. It uses the same syntax as `useState`.
+Its used internally by `ToggleThemeButton` component.
+
+```jsx
+import { defaultTheme, useTheme } from 'react-admin';
+import { Button } from '@mui/material';
+
+const lightTheme = defaultTheme;
+const darkTheme = {
+    ...defaultTheme,
+    palette: {
+        mode: 'dark',
+    },
+};
+
+const ThemeToggler = () => {
+    const [theme, setTheme] = useTheme();
+
+    return (
+        <Button onClick={() => setTheme(theme.palette.mode === 'dark' ? lightTheme : darkTheme)}>
+            {theme.palette.mode === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+        </Button>
+    );
+}
+```
+
 ## Conditional Formatting
 
 Sometimes you want the format to depend on the value. Use `useRecordContext` to grab the record in a component, and the `sx` prop to apply the format.
@@ -433,7 +461,7 @@ export const PostList = () => (
 ```
 {% endraw %}
 
-**Tip**: if you don't want to create a custom component to apply conditional formatting, you can also use [the `<WithRecord>` component](./WithRecord.md)].
+**Tip**: if you don't want to create a custom component to apply conditional formatting, you can also use [the `<WithRecord>` component](./WithRecord.md).
 
 ## `useMediaQuery` Hook
 
@@ -981,13 +1009,13 @@ const App = () => (
 
 ## Notifications
 
-You can override the notification component, for instance to change the notification duration. It defaults to 4000, i.e. 4 seconds, and you can override it using the `autoHideDuration` prop. For instance, to create a custom Notification component with a 5 seconds default:
+You can override the notification component, for instance to change the notification duration. A common use case is to change the `autoHideDuration`, and force the notification to remain on screen longer than the default 4 seconds. For instance, to create a custom Notification component with a 5 seconds default:
 
 ```jsx
 // in src/MyNotification.js
 import { Notification } from 'react-admin';
 
-const MyNotification = props => <Notification {...props} autoHideDuration={5000} />;
+const MyNotification = () => <Notification autoHideDuration={5000} />;
 
 export default MyNotification;
 ```
@@ -1017,7 +1045,7 @@ import Button from '@mui/material/Button';
 import ErrorIcon from '@mui/icons-material/Report';
 import History from '@mui/icons-material/History';
 import { Title, useTranslate } from 'react-admin';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 const MyError = ({
     error,
@@ -1043,14 +1071,14 @@ const MyError = ({
             {process.env.NODE_ENV !== 'production' && (
                 <details>
                     <h2>{translate(error.toString())}</h2>
-                    {errorInfo.componentStack}
+                    {error.componentStack}
                 </details>
             )}
             <div>
                 <Button
                     variant="contained"
                     startIcon={<History />}
-                    onClick={() => history.go(-1)}
+                    onClick={() => window.history.go(-1)}
                 >
                     Back
                 </Button>
@@ -1086,6 +1114,8 @@ const App = () => (
     </Admin>
 );
 ```
+
+**Tip:** [React's Error Boundaries](https://reactjs.org/docs/error-boundaries.html) are used internally to display the Error Page whenever an error occurs. Error Boundaries only catch errors during rendering, in lifecycle methods, and in constructors of the components tree. This implies in particular that errors during event callbacks (such as 'onClick') are not concerned. Also note that the Error Boundary component is only set around the main container of React Admin. In particular, you won't see it for errors thrown by the [sidebar Menu](./Menu.md), nor the [AppBar](#customizing-the-appbar-content). This ensures the user is always able to navigate away from the Error Page.
 
 ## Loading
 

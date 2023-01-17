@@ -390,7 +390,7 @@ The default `onError` function is:
 
 ```jsx
 (error) => {
-    notify(typeof error === 'string' ? error : error.message || 'ra.notification.http_error', { type: 'warning' });
+    notify(typeof error === 'string' ? error : error.message || 'ra.notification.http_error', { type: 'error' });
     if (mutationMode === 'undoable' || mutationMode === 'pessimistic') {
         refresh();
     }
@@ -630,3 +630,33 @@ You can do the same for error notifications, by passing a custom `onError`  call
 
 **Tip**: The notification message will be translated.
 
+## Editing A Record In A Modal
+
+`<Edit>` is designed to be a page component, passed to the `edit` prop of the `<Resource>` component. But you may want to let users edit a record from another page. 
+
+![EditDialog](https://marmelab.com/ra-enterprise/modules/assets/edit-dialog.gif)
+
+* If you want to allow edition from the `list` page, use [the `<EditDialog>` component](./EditDialog.md)
+* If you want to allow edition from another page, use [the `<EditInDialogButton>` component](./EditInDialogButton.md)
+
+## Live Updates
+
+If you want to subscribe to live updates on the record (topic: `resource/[resource]/[id]`), use [the `<EditLive>` component](./EditLive.md) instead.
+
+```diff
+-import { Edit, SimpleForm, TextInput } from 'react-admin';
++import { SimpleForm, TextInput } from 'react-admin';
++import { EditLive } from '@react-admin/ra-realtime';
+
+const PostEdit = () => (
+-   <Edit>
++   <EditLive>
+        <SimpleForm>
+            <TextInput source="title" />
+        </SimpleForm>
+-   </Edit>
++   </EditLive>
+);
+```
+
+The user will see alerts when other users update or delete the record.
